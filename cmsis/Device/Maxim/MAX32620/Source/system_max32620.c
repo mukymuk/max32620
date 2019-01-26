@@ -194,7 +194,7 @@ __weak void SystemInit(void)
 {
     /* Configure the interrupt controller to use the application vector table in */
     /* the application space */
-#if defined ( __GNUC__) 
+#if defined ( __GNUC__) && !defined (__CROSSWORKS_ARM)
     /* IAR sets the VTOR pointer prior to SystemInit and causes stack corruption to change it here. */
     __disable_irq(); /* Disable interrupts */
     SCB->VTOR = (uint32_t)__isr_vector; /* set the Vector Table to point at our ISR table */
@@ -285,8 +285,10 @@ __weak void SystemInit(void)
     __DSB();
     __ISB();
 
+#ifndef NO_TRIM_RO
     /* Perform an initial trim of the internal ring oscillator */
     CLKMAN_TrimRO();
+#endif
 
 #if !defined (__CC_ARM) // Prevent Keil tools from calling these functions until post scatter load
     SystemCoreClockUpdate();
